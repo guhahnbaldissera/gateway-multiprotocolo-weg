@@ -1,0 +1,396 @@
+/* ===========================================================================
+   Gateway Multiprotocolo WEG - folha de estilo
+   Segue ISA-101 (High Performance HMI):
+     - fundo cinza neutro, ~90% da tela em tons neutros
+     - COR RESERVADA PARA ANORMALIDADE (estado normal nao tem cor)
+     - no maximo 2 cores saturadas visiveis ao mesmo tempo em estado normal
+     - monoespacada para enderecos, valores e timestamps
+     - sem gradientes, sem glassmorphism, sem animacao decorativa
+   =========================================================================== */
+
+:root {
+    --fundo:        #2B2F33;
+    --superficie:   #34393E;
+    --superficie-2: #3B4147;
+    --borda:        #4A5058;
+    --texto:        #E6E8EA;
+    --texto-2:      #9AA1A9;
+    --texto-3:      #6E757D;
+
+    /* COR = ANORMALIDADE. Nunca usar para estado normal. */
+    --degradado:    #D9822B;  /* ambar  - sintetizado / aproximado / uncertain */
+    --falha:        #C0392B;  /* vermelho - bad / dropped / comm error */
+    --quarentena:   #8E5BA6;  /* roxo - categoria, nao severidade */
+    --perda:        #D4B12A;  /* amarelo - marcador de perda semantica */
+    --ok-discreto:  #6FA8A0;  /* verde dessaturado, uso minimo */
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "cabecalho cabecalho" "lateral conteudo";
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --------------------------------------------------------------- cabecalho */
+
+header {
+    grid-area: cabecalho;
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borda);
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .3px;
+}
+
+header .subtitulo {
+    color: var(--texto-3);
+    font-size: 11px;
+}
+
+header .indicadores {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--texto-2);
+}
+
+header .indicadores b {
+    color: var(--texto);
+    font-family: var(--mono);
+    font-weight: 500;
+}
+
+/* ----------------------------------------------------------------- lateral */
+
+nav {
+    grid-area: lateral;
+    background: var(--superficie);
+    border-right: 1px solid var(--borda);
+    padding: 10px 0;
+    overflow-y: auto;
+}
+
+nav button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-left: 2px solid transparent;
+    color: var(--texto-2);
+    padding: 8px 18px;
+    font-size: 12.5px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+nav button:hover { background: var(--superficie-2); color: var(--texto); }
+
+nav button.ativo {
+    background: var(--superficie-2);
+    border-left-color: var(--texto-2);
+    color: var(--texto);
+    font-weight: 500;
+}
+
+nav .grupo {
+    color: var(--texto-3);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 14px 18px 5px;
+}
+
+/* ---------------------------------------------------------------- conteudo */
+
+main {
+    grid-area: conteudo;
+    overflow-y: auto;
+    padding: 18px 22px 40px;
+}
+
+.aba { display: none; }
+.aba.ativa { display: block; }
+
+h2 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.explicacao {
+    color: var(--texto-3);
+    font-size: 11.5px;
+    margin-bottom: 16px;
+    max-width: 760px;
+}
+
+/* ------------------------------------------------------------------- cards */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.card {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    padding: 12px 14px;
+}
+
+.card .rotulo {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--texto-3);
+    margin-bottom: 6px;
+}
+
+.card .numero {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.card .nota { font-size: 10.5px; color: var(--texto-3); margin-top: 5px; }
+
+/* cor SO quando anormal */
+.card.anormal  { border-color: var(--degradado); }
+.card.anormal  .numero { color: var(--degradado); }
+.card.critico  { border-color: var(--falha); }
+.card.critico  .numero { color: var(--falha); }
+.card.quarentena { border-color: var(--quarentena); }
+.card.quarentena .numero { color: var(--quarentena); }
+
+/* ------------------------------------------------------------------ tabelas */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    margin-bottom: 20px;
+}
+
+th {
+    text-align: left;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--texto-3);
+    font-weight: 500;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--borda);
+    white-space: nowrap;
+}
+
+td {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(74, 80, 88, .45);
+    vertical-align: top;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--superficie-2); }
+
+td.mono, .mono { font-family: var(--mono); font-size: 12px; }
+td.num { text-align: right; font-family: var(--mono); }
+
+/* linha com perda semantica: marcador fino na borda, nunca fundo colorido */
+tr.tem-perda td:first-child { border-left: 2px solid var(--perda); }
+
+/* ------------------------------------------------------- estados e qualidade */
+
+.estado { font-family: var(--mono); font-size: 11.5px; }
+.estado.normal     { color: var(--texto); }
+.estado.degradado  { color: var(--degradado); }
+.estado.falha      { color: var(--falha); }
+.estado.quarentena { color: var(--quarentena); }
+
+/* dado ruim e DEGRADADO visualmente, nao apenas colorido (padrao Ignition) */
+.valor-suspeito {
+    color: var(--texto-3);
+    text-decoration: line-through;
+    text-decoration-color: var(--falha);
+}
+
+.submotivo { color: var(--texto-3); font-size: 11px; }
+
+/* --------------------------------------------------- lineage (drill-down) */
+
+/* lineage horizontal esquerda->direita (padrao de data lineage).
+   Nunca quebra linha: rola horizontalmente, preservando a leitura do fluxo. */
+.lineage {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 18px 0 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+
+.no {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    padding: 12px 14px;
+    min-width: 215px;
+    flex: 1 1 0;
+}
+
+.no.canonico { border-color: var(--texto-3); }
+
+.no .no-titulo {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--texto-3);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--borda);
+}
+
+.no dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 11.5px; }
+.no dt { color: var(--texto-3); white-space: nowrap; }
+.no dd { font-family: var(--mono); font-size: 11.5px; word-break: break-all; }
+
+.seta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 10px;
+    color: var(--texto-3);
+    font-family: var(--mono);
+    font-size: 16px;
+    flex: 0 0 96px;
+}
+
+/* a aresta COM PERDA e a unica cor forte da tela - e o diferencial do produto */
+.seta.com-perda { color: var(--perda); }
+
+.seta .rotulo-perda {
+    font-size: 9.5px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--perda);
+    text-align: center;
+    line-height: 1.25;
+}
+
+/* ------------------------------------------------------------- pilares */
+
+.pilares { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+.pilar {
+    border: 1px solid var(--borda);
+    padding: 3px 7px;
+    font-size: 10.5px;
+    color: var(--texto-2);
+}
+
+.pilar b { color: var(--texto); font-family: var(--mono); font-weight: 500; }
+.pilar.sintetizado { border-color: var(--degradado); color: var(--degradado); }
+.pilar.sintetizado b { color: var(--degradado); }
+.pilar.perdido { border-color: var(--falha); color: var(--falha); }
+.pilar.perdido b { color: var(--falha); text-decoration: line-through; }
+
+/* ------------------------------------------------------------- controles */
+
+.controles {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    padding: 14px;
+    margin-bottom: 20px;
+}
+
+.controles h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--texto-3);
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.linha-controle { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+
+button.acao, select {
+    background: var(--superficie-2);
+    border: 1px solid var(--borda);
+    color: var(--texto);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button.acao:hover { border-color: var(--texto-3); }
+button.acao.primaria { border-color: var(--texto-2); font-weight: 500; }
+button.acao.perigo:hover { border-color: var(--falha); color: var(--falha); }
+button.acao:disabled { opacity: .45; cursor: default; }
+
+select { min-width: 260px; font-family: var(--mono); font-size: 11.5px; }
+
+.barra-fila {
+    display: flex;
+    height: 26px;
+    border: 1px solid var(--borda);
+    margin-bottom: 4px;
+    background: var(--superficie);
+}
+
+.barra-fila div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    font-family: var(--mono);
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.seg-delivered  { background: var(--superficie-2); color: var(--texto-2); }
+.seg-pending    { background: rgba(217, 130, 43, .22); color: var(--degradado); }
+.seg-retry      { background: rgba(192, 57, 43, .22);  color: var(--falha); }
+.seg-quarantine { background: rgba(142, 91, 166, .25); color: var(--quarentena); }
+
+.legenda { display: flex; gap: 16px; font-size: 10.5px; color: var(--texto-3); margin-bottom: 18px; }
+
+.vazio { color: var(--texto-3); font-size: 11.5px; padding: 14px; text-align: center; }
+
+.cadeia-ok    { color: var(--ok-discreto); font-family: var(--mono); }
+.cadeia-falha { color: var(--falha); font-family: var(--mono); }
+
+.aviso {
+    border-left: 2px solid var(--degradado);
+    background: var(--superficie);
+    padding: 9px 12px;
+    font-size: 11.5px;
+    color: var(--texto-2);
+    margin-bottom: 14px;
+}

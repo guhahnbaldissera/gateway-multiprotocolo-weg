@@ -1,0 +1,76 @@
+# Arquivo proposital com erros de configuracao.
+# Usado no CENARIO 3 para demonstrar o tratamento de configuracao invalida:
+# cada ponto quebrado e rejeitado com motivo, e os validos continuam operando.
+
+mapping_version: "erro-demo"
+
+points:
+
+  # OK - este deve carregar normalmente
+  - point_id: PONTO_VALIDO
+    source_protocol: modbus
+    source_device: IED-MODBUS-01
+    source_address: "40001"
+    asset_id: TR-01
+    asset_type: power_transformer
+    measurement: oil_top_temperature
+    data_type: float
+    unit: Cel
+    scale: 0.1
+    target_protocol: opcua
+    target_address: TR-01.OilTemp
+
+  # ERRO 1 - tipo de dado inexistente
+  - point_id: ERRO_TIPO_INVALIDO
+    source_protocol: modbus
+    source_device: IED-MODBUS-01
+    source_address: "40002"
+    asset_id: TR-01
+    asset_type: power_transformer
+    measurement: secondary_current_l1
+    data_type: flooat          # <-- erro de digitacao
+    unit: A
+    target_protocol: opcua
+    target_address: TR-01.CurrentL1
+
+  # ERRO 2 - escala zero zeraria toda leitura do ponto
+  - point_id: ERRO_ESCALA_ZERO
+    source_protocol: modbus
+    source_device: IED-MODBUS-01
+    source_address: "40003"
+    asset_id: TR-01
+    asset_type: power_transformer
+    measurement: winding_temperature
+    data_type: float
+    unit: Cel
+    scale: 0                   # <-- qualquer leitura viraria 0
+    target_protocol: opcua
+    target_address: TR-01.WindingTemp
+
+  # ERRO 3 - faixa de validacao invertida
+  - point_id: ERRO_FAIXA_INVERTIDA
+    source_protocol: modbus
+    source_device: IED-MODBUS-01
+    source_address: "40004"
+    asset_id: TR-01
+    asset_type: power_transformer
+    measurement: ambient_temperature
+    data_type: float
+    unit: Cel
+    scale: 0.1
+    min_value: 100.0           # <-- minimo maior que o maximo
+    max_value: 20.0
+    target_protocol: opcua
+    target_address: TR-01.AmbientTemp
+
+  # ERRO 4 - campo obrigatorio ausente (sem asset_id)
+  - point_id: ERRO_SEM_ATIVO
+    source_protocol: modbus
+    source_device: IED-MODBUS-01
+    source_address: "40005"
+    asset_type: power_transformer
+    measurement: oil_level
+    data_type: float
+    unit: pct
+    target_protocol: opcua
+    target_address: TR-01.OilLevel

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gateway Multiprotocolo WEG</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Gateway Multiprotocolo &mdash; Interoperabilidade Semantica</h1>
+        <div class="subtitulo">Hackathon Integre JR 2026 &middot; Desafio WEG</div>
+    </div>
+    <div class="indicadores">
+        <span>de-para <b id="ind-versao">&mdash;</b></span>
+        <span>pontos <b id="ind-pontos">&mdash;</b></span>
+        <span>entregues <b id="ind-entregues">&mdash;</b></span>
+        <span id="ind-alerta"></span>
+    </div>
+</header>
+
+<nav>
+    <div class="grupo">Operacao</div>
+    <button class="ativo" data-aba="visao">Visao Geral</button>
+    <button data-aba="conexoes">Conexoes</button>
+    <button data-aba="mapeamento">Mapeamento</button>
+
+    <div class="grupo">Analise</div>
+    <button data-aba="traducao">Traducao ao Vivo</button>
+    <button data-aba="fila">Fila de Eventos</button>
+    <button data-aba="perdas">Perda Semantica</button>
+    <button data-aba="capacidades">Capacidades</button>
+
+    <div class="grupo">Diagnostico</div>
+    <button data-aba="ensaios">Ensaios de Falha</button>
+    <button data-aba="auditoria">Trilha de Auditoria</button>
+</nav>
+
+<main>
+
+<!-- ============================================================ VISAO GERAL -->
+<section class="aba ativa" id="aba-visao">
+    <h2>Visao Geral</h2>
+    <p class="explicacao">
+        Estado do gateway em operacao. Seguindo ISA-101, o estado normal nao usa cor:
+        se algo aparece colorido nesta tela, e porque exige atencao.
+    </p>
+    <div class="cards" id="cards-visao"></div>
+
+    <h2>Origens conectadas</h2>
+    <p class="explicacao">Os quatro protocolos do desafio, adquirindo em paralelo.</p>
+    <table>
+        <thead><tr>
+            <th>Protocolo</th><th>Papel</th><th>Dispositivo</th>
+            <th>Estado</th><th>Observacao</th>
+        </tr></thead>
+        <tbody id="tab-visao-conexoes"></tbody>
+    </table>
+</section>
+
+<!-- =============================================================== CONEXOES -->
+<section class="aba" id="aba-conexoes">
+    <h2>Conexoes</h2>
+    <p class="explicacao">
+        Estado por protocolo e dispositivo. Falhas sao reportadas com submotivo textual
+        (convencao Kepware/Ignition): nunca apenas "Bad", sempre "Bad (motivo)".
+    </p>
+    <table>
+        <thead><tr>
+            <th>Protocolo</th><th>Papel</th><th>Dispositivo / Endpoint</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="tab-conexoes"></tbody>
+    </table>
+</section>
+
+<!-- ============================================================= MAPEAMENTO -->
+<section class="aba" id="aba-mapeamento">
+    <h2>Mapeamento de Pontos (de-para)</h2>
+    <p class="explicacao">
+        Tela central do gateway: uma linha por ponto, origem &rarr; destino. Alterar este
+        mapeamento nao exige recompilar nada. Linhas marcadas na borda esquerda tiveram
+        perda semantica registrada na ultima conversao.
+    </p>
+    <table>
+        <thead><tr>
+            <th>Ponto</th><th>Ativo</th><th>Grandeza</th>
+            <th>Origem</th><th>Endereco nativo</th>
+            <th>Tipo</th><th>Unid.</th><th>Escala</th>
+            <th>Destino</th><th>Endereco destino</th>
+        </tr></thead>
+        <tbody id="tab-mapeamento"></tbody>
+    </table>
+</section>
+
+<!-- ============================================================== TRADUCAO -->
+<section class="aba" id="aba-traducao">
+    <h2>Traducao ao Vivo</h2>
+    <p class="explicacao">
+        Dispara uma conversao real (mesma funcao usada pela CLI e pela demonstracao) e
+        mostra o caminho do dado: origem &rarr; modelo canonico &rarr; destino. A seta
+        marcada em amarelo indica metadados que o protocolo de destino nao consegue
+        representar.
+    </p>
+
+    <div class="controles">
+        <h3>Executar conversao</h3>
+        <div class="linha-controle">
+            <select id="sel-ponto"></select>
+            <button class="acao primaria" id="btn-traduzir">Executar leitura</button>
+            <span class="submotivo" id="traducao-msg"></span>
+        </div>
+    </div>
+
+    <div id="resultado-traducao"></div>
+</section>
+
+<!-- =================================================================== FILA -->
+<section class="aba" id="aba-fila">
+    <h2>Fila de Eventos</h2>
+    <p class="explicacao">
+        Todo evento e persistido ANTES da tentativa de publicacao. Nenhum dado desaparece
+        em silencio: ele sempre esta em um estado verificavel.
+    </p>
+
+    <div class="barra-fila" id="barra-fila"></div>
+    <div class="legenda">
+        <span>delivered &mdash; confirmado no destino</span>
+        <span>pending &mdash; aguardando publicacao</span>
+        <span>retry &mdash; falhou, sera reenviado</span>
+        <span>quarantine &mdash; rejeitado com motivo</span>
+    </div>
+
+    <div class="linha-controle" style="margin-bottom:16px">
+        <button class="acao" id="btn-flush">Reenviar fila (flush)</button>
+        <span class="submotivo" id="flush-msg"></span>
+    </div>
+
+    <table>
+        <thead><tr>
+            <th>Estado</th><th>Ponto</th><th>Ativo</th><th>Valor</th>
+            <th>Qualidade</th><th>Origem</th><th>Tent.</th><th>Quando</th>
+        </tr></thead>
+        <tbody id="tab-eventos"></tbody>
+    </table>
+</section>
+
+<!-- ================================================================= PERDAS -->
+<section class="aba" id="aba-perdas">
+    <h2>Perda Semantica</h2>
+    <p class="explicacao">
+        Toda degradacao de informacao fica registrada com motivo, valor de origem, valor
+        de destino e a versao da regra que a causou. Perda nao e bug: e consequencia da
+        capacidade de cada protocolo &mdash; o que seria um problema e ela acontecer sem
+        ninguem saber.
+    </p>
+
+    <h2>Resumo acumulado</h2>
+    <table>
+        <thead><tr><th>Tipo</th><th>Campo</th><th>Ocorrencias</th><th>Motivo</th></tr></thead>
+        <tbody id="tab-perdas-resumo"></tbody>
+    </table>
+
+    <h2>Registros recentes</h2>
+    <table>
+        <thead><tr>
+            <th>Tipo</th><th>Campo</th><th>Origem</th><th>Destino</th>
+            <th>Motivo</th><th>Regra</th>
+        </tr></thead>
+        <tbody id="tab-perdas-recentes"></tbody>
+    </table>
+</section>
+
+<!-- ============================================================ CAPACIDADES -->
+<section class="aba" id="aba-capacidades">
+    <h2>Matriz de Capacidades</h2>
+    <p class="explicacao">
+        Cada adaptador de destino declara o que consegue representar. A deteccao de perda
+        e DERIVADA desta tabela &mdash; nao existe regra escrita por par de protocolos.
+        Por isso o DNP3, sem pilha implementada, ja e analisado corretamente: basta ter
+        declarado suas capacidades.
+    </p>
+    <table>
+        <thead><tr>
+            <th>Protocolo (destino)</th><th>Implementado</th><th>Qualidade</th>
+            <th>Timestamp</th><th>Unidade</th><th>Modelo semantico</th>
+            <th>Float</th><th>Bits</th><th>Estados de qualidade</th>
+        </tr></thead>
+        <tbody id="tab-capacidades"></tbody>
+    </table>
+</section>
+
+<!-- ================================================================ ENSAIOS -->
+<section class="aba" id="aba-ensaios">
+    <h2>Ensaios de Falha</h2>
+    <p class="explicacao">
+        Injeta falhas reais no sistema em operacao, para demonstrar o comportamento sob
+        anomalia. Nada aqui e encenado: os botoes alteram o estado dos simuladores e do
+        destino, e o resultado aparece na fila e na auditoria.
+    </p>
+
+    <div class="controles">
+        <h3>Destino fora do ar (store-and-forward)</h3>
+        <div class="linha-controle">
+            <button class="acao perigo" id="btn-derrubar">Derrubar destino OPC UA</button>
+            <button class="acao" id="btn-religar">Religar destino</button>
+            <span class="submotivo" id="destino-msg"></span>
+        </div>
+    </div>
+
+    <div class="controles">
+        <h3>Falta de sensor</h3>
+        <div class="linha-controle">
+            <button class="acao perigo" data-falha="sensor" data-proto="dnp3" data-ligar="1">
+                DNP3: outstation offline</button>
+            <button class="acao" data-falha="sensor" data-proto="dnp3" data-ligar="0">
+                DNP3: restaurar</button>
+            <span class="submotivo" id="sensor-msg"></span>
+        </div>
+    </div>
+
+    <div class="controles">
+        <h3>Defeito mecanico (leitura implausivel)</h3>
+        <div class="linha-controle">
+            <button class="acao perigo" data-falha="mecanica" data-proto="dnp3" data-ligar="1">
+                DNP3: defeito</button>
+            <button class="acao" data-falha="mecanica" data-proto="dnp3" data-ligar="0">
+                DNP3: restaurar</button>
+            <button class="acao perigo" data-falha="mecanica" data-proto="opcua" data-ligar="1">
+                OPC UA: StatusCode Bad</button>
+            <button class="acao" data-falha="mecanica" data-proto="opcua" data-ligar="0">
+                OPC UA: restaurar</button>
+            <span class="submotivo" id="mecanica-msg"></span>
+        </div>
+    </div>
+
+    <div class="aviso">
+        Depois de injetar uma falha, execute uma leitura em <b>Traducao ao Vivo</b> para
+        ver o comportamento, e confira o registro em <b>Fila</b> e <b>Trilha de Auditoria</b>.
+    </div>
+</section>
+
+<!-- ============================================================== AUDITORIA -->
+<section class="aba" id="aba-auditoria">
+    <h2>Trilha de Auditoria</h2>
+    <p class="explicacao">
+        Cada entrada encadeia o hash da anterior. Alterar um registro antigo quebra a
+        cadeia e isso fica detectavel. Nao e blockchain &mdash; e um log com deteccao de
+        adulteracao.
+    </p>
+    <div class="cards">
+        <div class="card" id="card-cadeia">
+            <div class="rotulo">Integridade da cadeia</div>
+            <div class="numero" id="cadeia-estado" style="font-size:16px">&mdash;</div>
+            <div class="nota" id="cadeia-nota"></div>
+        </div>
+    </div>
+    <table>
+        <thead><tr><th>Seq</th><th>Acao</th><th>Detalhe</th><th>Hash</th><th>Quando</th></tr></thead>
+        <tbody id="tab-auditoria"></tbody>
+    </table>
+</section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
